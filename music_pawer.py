@@ -5,41 +5,34 @@ import urllib
 import urllib2
 import socket 
 import sys
-'''
-# timeout in seconds 
-timeout = 50 
-socket.setdefaulttimeout(timeout) 
-'''
-'''
-class parseLinks(HTMLParser.HTMLParser):
-	def handle_starttag(self, tag, attrs):
-		if tag == 'em':
-			for name,value in attrs:
-				if name == 'id':
-					print value
-lParser = parseLinks()
-lParser.feed(urllib.urlopen("http://y.qq.com/y/static/index.html").read())
-'''
-'''	
-	text = html.read(90000)
-	html.close()
-'''
-f = open("new_song_list.txt","wb+")
-f2 = open("random_song_list.txt","wb+")
+import dbconfig
+import MySQLdb as mdb
 try:
 
+	conn = dbconfig.connectDB()
+	cur  = conn.cursor(mdb.cursors.DictCursor)
+	
+	sql = 'select * from music'
+	cur.execute(sql)
+	results = cur.fetchall()			
 	##qqmusic
+
 	html = urllib.urlopen('http://y.qq.com/y/static/index.html')
 	tt = ''
 	for i in range(0, 9):
 		text = html.read(10000)
 		tt += text
-
+#	print tt
 	soup = BeautifulSoup(tt)
 
-	qq_new	= soup.find('ul', {'class':'mod_first_list'})
 	
+	qq_new	= soup.find('ul', {'class':'mod_first_list'})
+
+#	print qq_new	
 	for x in qq_new.find_all('li'):	
+
+
+
 		a = x.find('a',{'class':'mod_poster_130'})	
 		print 'song_url', 'http://y.qq.com' + a.get('href')	
 		em = x.find('strong', {'class':'album_name'})
@@ -47,7 +40,21 @@ try:
 		em = x.find('strong', {'class':'album_singer'})
 		print 'singer', em.contents[0].encode('utf8')
 
+                url = 'http://y.qq.com' + a.get('href')
+                song =   em.contents[0]
+                singer =  em.contents[0]
 
+                source = 'qq'
+
+
+	        exist = False;
+	        for item in results:
+        	        if item['song'] == song:
+                	        exist = True
+	        if not exist:
+        	        sql = 'insert into music (url, song, singer, source) values ("%s", "%s", "%s", "%s")' % (url, song, singer, source)
+	                cur.execute(sql)
+        	        conn.commit()
 	#xiami 
 	url = 'http://www.xiami.com'
 	user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
@@ -59,18 +66,33 @@ try:
 	req = urllib2.Request(url, data, headers)
 	response = urllib2.urlopen(req)
 	the_page = response.read()	
-
+#	print the_page
 	soup = BeautifulSoup(the_page)
 
 	xiami_new	= soup.find('div', {'id':'albums'})
+#	print xiami_new
 	info = xiami_new.find('div',{'class':'album'})				
 	#print info
 	a = info.find('div',{'class':'info'})	
 	p = a.find_all('p')	
+	
 
+	url = 'http://www.xiami.com' +p[0].find('a').get('href')
+	song =  p[0].find('a').string.encode('utf8')
+	singer =  p[1].find('a').string.encode('utf8')
+	source = 'xiami'
 	print 'song_url' , 'http://www.xiami.com' +p[0].find('a').get('href')
 	print 'song', p[0].find('a').string.encode('utf8')
 	print 'singer', p[1].find('a').string.encode('utf8')
+	exist = False;
+	for item in results:
+		if item['song'] == song:
+			exist = True	
+	if not exist:
+		sql = 'insert into music (url, song, singer, source) values ("%s", "%s", "%s", "%s")' % (url, song, singer, source)
+		cur.execute(sql)
+		conn.commit()
+
 	for sibling in info.next_siblings:
 		#print(repr(sibling))
 		#break
@@ -81,6 +103,24 @@ try:
 			print 'song_url' , 'http://www.xiami.com' + p[0].find('a').get('href')
 			print 'song', p[0].find('a').string.encode('utf8')
 			print 'singer', p[1].find('a').string.encode('utf8')
+
+
+		        url = 'http://www.xiami.com' +p[0].find('a').get('href')
+		        song =  p[0].find('a').string
+		        singer =  p[1].find('a').string
+		        source = 'xiami'
+		        print 'song_url' , 'http://www.xiami.com' +p[0].find('a').get('href')
+		        print 'song', p[0].find('a').string.encode('utf8')
+		        print 'singer', p[1].find('a').string.encode('utf8')
+		        exist = False;
+		        for item in results:
+		                if item['song'] == song:
+		                        exist = True
+		        if not exist:
+		                sql = 'insert into music (url, song, singer, source) values ("%s", "%s", "%s", "%s")' %( url, song, singer, source)
+		                cur.execute(sql)
+		                conn.commit()
+
 		#print a
 	#for x in xiami_new:	
 	#	a = x.find('div',{'class':'info'})								
@@ -89,4 +129,4 @@ try:
 
 except socket.error, msg:
 	print 'error'
-    
+conn.close() 
