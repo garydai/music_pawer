@@ -7,6 +7,7 @@ import socket
 import sys
 import dbconfig
 import MySQLdb as mdb
+from datetime import *
 try:
 
 	conn = dbconfig.connectDB()
@@ -19,13 +20,14 @@ try:
 
 	html = urllib.urlopen('http://y.qq.com/y/static/index.html')
 	tt = ''
-	for i in range(0, 9):
-		text = html.read(10000)
-		tt += text
+#	for i in range(0, 9):
+#		text = html.read(10000)
+#		tt += text
 #	print tt
-	soup = BeautifulSoup(tt)
+	soup = BeautifulSoup(html)
 
 	
+	now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 	qq_new	= soup.find('ul', {'class':'mod_first_list'})
 
 #	print qq_new	
@@ -44,7 +46,7 @@ try:
                 song =   em.contents[0]
                 singer =  em.contents[0]
 
-                source = 'qq'
+                source = u'qq'
 
 
 	        exist = False;
@@ -52,7 +54,7 @@ try:
         	        if item['song'] == song:
                 	        exist = True
 	        if not exist:
-        	        sql = 'insert into music (url, song, singer, source) values ("%s", "%s", "%s", "%s")' % (url, song, singer, source)
+        	        sql = 'insert into music (url, song, singer, source, date) values ("%s", "%s", "%s", "%s", "%s")' % (url, song, singer, source, now)
 	                cur.execute(sql)
         	        conn.commit()
 	#xiami 
@@ -80,7 +82,7 @@ try:
 	url = 'http://www.xiami.com' +p[0].find('a').get('href')
 	song =  p[0].find('a').string.encode('utf8')
 	singer =  p[1].find('a').string.encode('utf8')
-	source = 'xiami'
+	source = u'xiami'
 	print 'song_url' , 'http://www.xiami.com' +p[0].find('a').get('href')
 	print 'song', p[0].find('a').string.encode('utf8')
 	print 'singer', p[1].find('a').string.encode('utf8')
@@ -88,8 +90,9 @@ try:
 	for item in results:
 		if item['song'] == song:
 			exist = True	
+	
 	if not exist:
-		sql = 'insert into music (url, song, singer, source) values ("%s", "%s", "%s", "%s")' % (url, song, singer, source)
+		sql = 'insert into music (url, song, singer, source,date) values ("%s", "%s", "%s", "%s", "%s")' % (url, song, singer, source, now)
 		cur.execute(sql)
 		conn.commit()
 
@@ -117,15 +120,44 @@ try:
 		                if item['song'] == song:
 		                        exist = True
 		        if not exist:
-		                sql = 'insert into music (url, song, singer, source) values ("%s", "%s", "%s", "%s")' %( url, song, singer, source)
+		                sql = 'insert into music (url, song, singer, source, date) values ("%s", "%s", "%s", "%s", "%s")' %( url, song, singer, source, now)
 		                cur.execute(sql)
 		                conn.commit()
 
-		#print a
-	#for x in xiami_new:	
-	#	a = x.find('div',{'class':'info'})								
-	#	info = a.find_all('p')
-	#	print info[0].contents
+
+	#163
+
+	html = urllib.urlopen('http://music.163.com/discover')
+	text =  html.read()
+	soup = BeautifulSoup(text)
+	#print text
+	a	= soup.find('ul', {'class':'f-cb roller-flag'})
+	#print a
+	for x in a.find_all('li'):	
+		p = x.find_all('p')
+
+
+                url = 'http://music.163.com/#' +p[0].find('a').get('href')
+                song =  p[0].find('a').string
+                singer =  p[1].find('a').string
+                source = '163'
+                print 'song_url' , 'http://music.163.com/#' +p[0].find('a').get('href')
+                print 'song', p[0].find('a').string.encode('utf8')
+                print 'singer', p[1].find('a').string.encode('utf8')
+                exist = False;
+                for item in results:
+			if item['song'] == song:
+                        	exist = True
+                if not exist:
+			sql = 'insert into music (url, song, singer, source, date) values ("%s", "%s", "%s", "%s", "%s")' %( url, song, singer, source, now)
+                        cur.execute(sql)
+                        conn.commit()
+
+
+
+
+
+
 
 except socket.error, msg:
 	print 'error'
