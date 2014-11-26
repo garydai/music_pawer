@@ -52,6 +52,10 @@ try:
 	        exist = False;
 	        for item in results:
         	        if item['song'] == song:
+	                        sql = 'update music set date="%s" where id=%d' %(now, item['id'])
+        	                cur.execute(sql)
+                	        conn.commit()
+
                 	        exist = True
 	        if not exist:
         	        sql = 'insert into music (url, song, singer, source, date) values ("%s", "%s", "%s", "%s", "%s")' % (url, song, singer, source, now)
@@ -89,6 +93,10 @@ try:
 	exist = False;
 	for item in results:
 		if item['song'] == song:
+			sql = 'update music set date="%s" where id=%d'%(now, item['id'])
+			cur.execute(sql)
+			conn.commit()
+
 			exist = True	
 	
 	if not exist:
@@ -118,6 +126,10 @@ try:
 		        exist = False;
 		        for item in results:
 		                if item['song'] == song:
+		                        sql = 'update music set date="%s" where id=%d' %(now, item['id'])
+        		                cur.execute(sql)
+                        		conn.commit()
+
 		                        exist = True
 		        if not exist:
 		                sql = 'insert into music (url, song, singer, source, date) values ("%s", "%s", "%s", "%s", "%s")' %( url, song, singer, source, now)
@@ -131,7 +143,7 @@ try:
 	text =  html.read()
 	soup = BeautifulSoup(text)
 	#print text
-	a	= soup.find('ul', {'class':'f-cb roller-flag'})
+	a	= soup.find('div', {'class':'roll f-pr'})
 	#print a
 	for x in a.find_all('li'):	
 		p = x.find_all('p')
@@ -147,14 +159,15 @@ try:
                 exist = False;
                 for item in results:
 			if item['song'] == song:
+	                        sql = 'update music set date="%s" where id=%d' %(now, item['id'])
+        	                cur.execute(sql)
+                	        conn.commit()
+
                         	exist = True
                 if not exist:
 			sql = 'insert into music (url, song, singer, source, date) values ("%s", "%s", "%s", "%s", "%s")' %( url, song, singer, source, now)
                         cur.execute(sql)
                         conn.commit()
-
-
-
 
 
 
