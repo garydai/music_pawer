@@ -13,10 +13,16 @@ try:
 	conn = dbconfig.connectDB()
 	cur  = conn.cursor(mdb.cursors.DictCursor)
 	
-	sql = 'select * from music'
-	cur.execute(sql)
-	results = cur.fetchall()			
 	##qqmusic
+
+
+
+
+        sql = 'select * from music where source="qq" '
+        cur.execute(sql)
+        results = cur.fetchall()
+
+
 
 	html = urllib.urlopen('http://y.qq.com/y/static/index.html')
 	tt = ''
@@ -35,23 +41,28 @@ try:
 
 
 
-		a = x.find('a',{'class':'mod_poster_130'})	
+		a = x.find('a',{'class':'mod_poster_130'})
+			
+                url = 'http://y.qq.com' + a.get('href')
 		print 'song_url', 'http://y.qq.com' + a.get('href')	
 		em = x.find('strong', {'class':'album_name'})
+                song =   em.contents[0]
 		print 'song', em.contents[0].encode('utf8')
 		em = x.find('strong', {'class':'album_singer'})
+                singer =  em.contents[0]
 		print 'singer', em.contents[0].encode('utf8')
 
-                url = 'http://y.qq.com' + a.get('href')
-                song =   em.contents[0]
-                singer =  em.contents[0]
 
                 source = u'qq'
 
 
 	        exist = False;
 	        for item in results:
+			print item['song'],song
+
         	        if item['song'] == song:
+				print item['song'],song
+
 	                        sql = 'update music set date="%s" where id=%d' %(now, item['id'])
         	                cur.execute(sql)
                 	        conn.commit()
@@ -61,7 +72,15 @@ try:
         	        sql = 'insert into music (url, song, singer, source, date) values ("%s", "%s", "%s", "%s", "%s")' % (url, song, singer, source, now)
 	                cur.execute(sql)
         	        conn.commit()
+
+
+
 	#xiami 
+
+        sql = 'select * from music where source="xiami"'
+        cur.execute(sql)
+        results = cur.fetchall()
+
 	url = 'http://www.xiami.com'
 	user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 	values = {'name' : 'Michael Foord',
@@ -84,15 +103,17 @@ try:
 	
 
 	url = 'http://www.xiami.com' +p[0].find('a').get('href')
-	song =  p[0].find('a').string.encode('utf8')
-	singer =  p[1].find('a').string.encode('utf8')
+	song =  p[0].find('a').string
+	singer =  p[1].find('a').string
 	source = u'xiami'
 	print 'song_url' , 'http://www.xiami.com' +p[0].find('a').get('href')
 	print 'song', p[0].find('a').string.encode('utf8')
 	print 'singer', p[1].find('a').string.encode('utf8')
 	exist = False;
 	for item in results:
+		print item['song'],song
 		if item['song'] == song:
+			print item['song'],song
 			sql = 'update music set date="%s" where id=%d'%(now, item['id'])
 			cur.execute(sql)
 			conn.commit()
@@ -138,6 +159,10 @@ try:
 
 
 	#163
+
+        sql = 'select * from music where source="163"'
+        cur.execute(sql)
+        results = cur.fetchall()
 
 	html = urllib.urlopen('http://music.163.com/discover')
 	text =  html.read()
