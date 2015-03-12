@@ -197,6 +197,6 @@ try:
 
 
 
-except socket.error, msg:
-	print 'error'
+except Exception, e:
+	print e
 conn.close() 
