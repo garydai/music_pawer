@@ -17,4 +17,15 @@ class MusicItem(scrapy.Item):
 	singer = Field()
 	source = Field()
 	date = Field()
+	image = Field()
+	discuss = Field()
+	album_id = Field()	
+
+class commentItem(scrapy.Item):
 	
+	album_id = Field()
+	comment = Field()
+	singer = Field()
+	song = Field()
+	tag = Field()
+
