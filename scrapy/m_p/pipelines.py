@@ -56,13 +56,13 @@ class mysql_pipeline(object):
 
 		else:
 
-			sql = 'select count(*) from comment where tag = "%s" ' % (item['tag'])
+			sql = 'select count(*) from other_comment where tag = "%s" ' % (item['tag'])
 			
                         cur.execute(sql)
                         results = cur.fetchone()
 			if results['count(*)'] == 0:
 
-				sql = 'insert into comment (album_id, comment, tag) values ("%s", "%s", "%s")' %(item['album_id'], item['comment'], item['tag'])
+				sql = 'insert into other_comment (album_id, comment, tag) values ("%s", "%s", "%s")' %(item['album_id'], item['comment'], item['tag'])
 				cur.execute(sql)
 				self.conn.commit()
 		
