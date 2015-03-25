@@ -13,7 +13,7 @@ BOT_NAME = 'm_p'
 SPIDER_MODULES = ['m_p.spiders']
 NEWSPIDER_MODULE = 'm_p.spiders'
 
-ITEM_PIPELINES = ['m_p.pipelines.mysql_pipeline',]
+ITEM_PIPELINES = {'m_p.pipelines.mysql_pipeline':2, 'm_p.pipelines.download_image_pipeline':1 }
 
 SERVER = "localhost"
 PORT = 3306
@@ -22,5 +22,6 @@ COLLECTION = "music"
 USER = 'root'
 PASSWORD = ''
 CHARSET = 'utf8'
+IMAGES_STORE='/home/admin/nginx/html/yii/demos/music_web/images/cover/'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'm_p (+http://www.yourdomain.com)'

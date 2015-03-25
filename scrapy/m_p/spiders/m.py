@@ -57,6 +57,8 @@ class MusicSpider(BaseSpider):
 		#	print 'singer', em.contents[0].encode('utf8')
 
 
+			cover_div = x.find('a').find('img').get('_src')
+
 
 			m_item['song'] = song
 			m_item['url'] = url
@@ -64,6 +66,7 @@ class MusicSpider(BaseSpider):
 			m_item['source'] = u'QQ'
 			now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			m_item['date'] = now
+			m_item['image'] = cover_div
 			items.append(m_item)
 
 		return items
@@ -116,6 +119,9 @@ class MusicSpider(BaseSpider):
 
 #		yield items
 
+	
+				
+
 	def parse_xiami_discuss(self, response):
 
 
@@ -133,7 +139,13 @@ class MusicSpider(BaseSpider):
 		m_item['singer'] = singer
 		m_item['source'] = u'xiami'
 		m_item['image'] = image
-		
+
+	#	postfix = source + str(int(time.time())) + '.jpg'
+	#	save_image = '/home/admin/nginx/html/yii/demos/music_web/images/cover/' + postfix
+	#	print save_image
+	#	callback = lambda response: self.getImage(response, image, postfix)
+
+	#	yield Request(image,)	
 		now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 		id = response.url.rfind('/')
 		album_id = response.url[id + 1:]
@@ -184,6 +196,7 @@ class MusicSpider(BaseSpider):
 
         #print text
 		a       = soup.find('div', {'class':'roll f-pr'})
+		
         #print a
 		items = []
 		for x in a.find_all('li'):
@@ -195,6 +208,9 @@ class MusicSpider(BaseSpider):
 			song =  p[0].find('a').string
 			singer =  p[1].find('a').string
 			source = '163'
+
+	
+			
 		#	print 'song_url' , 'http://music.163.com/#' +p[0].find('a').get('href')
 		#	print 'song', p[0].find('a').string.encode('utf8')
 		#	print 'singer', p[1].find('a').string.encode('utf8')
@@ -207,6 +223,10 @@ class MusicSpider(BaseSpider):
 			now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			m_item['source'] = source
 			m_item['date'] = now
+			
+			cover_div = x.find('div', {'class':'u-cover u-cover-alb1'}).find('img').get('data-src')
+			m_item['image'] = cover_div
+
 			items.append(m_item)
 
 		return items
