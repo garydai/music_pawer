@@ -10,7 +10,7 @@ from scrapy.http import Request
 class MusicSpider(BaseSpider):
 	name = 'music'
 	allowed_domains = []
-	start_urls = ['http://y.qq.com/y/static/index.html', 'http://www.xiami.com', 'http://music.163.com/discover', 'http://music.163.com/api/v1/resource/comments/R_AL_3_3104053/?rid=R_AL_3_3104053&offset=0&total=true&limit=20&csrf_token=']
+	start_urls = ['http://y.qq.com/y/static/index.html', 'http://www.xiami.com', 'http://music.163.com/discover']
   
 
 #	start_urls = ['http://music.163.com/api/v1/resource/comments/R_AL_3_3104053/?rid=R_AL_3_3104053&offset=0&total=true&limit=20&csrf_token=']
@@ -151,7 +151,7 @@ class MusicSpider(BaseSpider):
 		album_id = response.url[id + 1:]
 		m_item['album_id'] = album_id	
 		m_item['date'] = now
-		yield Request('http://www.xiami.com/commentlist/turnpage/id/'+album_id+'/page/1/ajax/1?type=1', callback=self.parse_xiami_comment)
+#		yield Request('http://www.xiami.com/commentlist/turnpage/id/'+album_id+'/page/1/ajax/1?type=1', callback=self.parse_xiami_comment)
 
 		yield m_item
 #		print 111111111111111111111111111111111111111111111111111111111111111
@@ -205,6 +205,8 @@ class MusicSpider(BaseSpider):
 
 
 			url = 'http://music.163.com/#' +p[0].find('a').get('href')
+			album_id = url[url.find('id=')+3:]
+
 			song =  p[0].find('a').string
 			singer =  p[1].find('a').string
 			source = '163'
@@ -223,7 +225,7 @@ class MusicSpider(BaseSpider):
 			now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			m_item['source'] = source
 			m_item['date'] = now
-			
+			m_item['album_id'] = album_id			
 			cover_div = x.find('div', {'class':'u-cover u-cover-alb1'}).find('img').get('data-src')
 			m_item['image'] = cover_div
 
