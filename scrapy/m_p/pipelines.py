@@ -60,22 +60,29 @@ class mysql_pipeline(object):
 			for row in results:
 		#	print row['song'],song
 
-				if row['song'] == song:
+				if row['song'] == song and row['singer'] == singer:
 		#		print row['song'],song
 
-					sql = 'update music set date="%s" where id=%d' %(d, row['id'])
+					sql = 'update music set date="%s", url="%s", source="%s", album_id="%s" where id=%d' %(d, url, source, album_id, row['id'])
+
+
+					
 					#更新来源xiami，因为它有评论
-					if source == 'xiami':
-						sql = 'update music set date="%s" , image="%s", source="%s", album_id="%s" , url="%s" where id=%d' %(d, postfix, source, album_id, url, row['id'])
+					#if source == 'xiami':
+					#	sql = 'update music set date="%s" , image="%s", source="%s", album_id="%s" , url="%s" where id=%d' %(d, postfix, source, album_id, url, row['id'])
 
 					cur.execute(sql)
 					self.conn.commit()
 
 					exist = True
+					break
+				
 			if not exist:
 				sql = 'insert into music (image, url, song, singer, source, date, album_id) values ("%s", "%s", "%s", "%s", "%s", "%s", "%s")' % (postfix, url, song, singer, source, d, album_id)
 				cur.execute(sql)
 				self.conn.commit()
+			else:
+				raise DropItem("has existed item  %s" % item)
 
 		##评论
 

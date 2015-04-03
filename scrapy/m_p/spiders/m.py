@@ -6,7 +6,8 @@ from m_p.items import *
 from datetime import *
 import urllib
 from scrapy.http import Request
-
+import json
+import re
 class MusicSpider(BaseSpider):
 	name = 'music'
 	allowed_domains = []
@@ -20,7 +21,7 @@ class MusicSpider(BaseSpider):
 #		print response.body
 
 		if response.url == 'http://y.qq.com/y/static/index.html':
-
+		#if response.url == 'http://y.qq.com/y/static/recom/song.js?loginUin=0&hostUin=0&format=jsonp&inCharset=GB2312&outCharset=utf-8&notice=0&platform=yqq&jsonpCallback=MusicJsonCallback&needNewCode=0':
 			return self.parseQQ(response)
 
 		elif response.url == 'http://www.xiami.com':
@@ -34,6 +35,26 @@ class MusicSpider(BaseSpider):
 
 	def parseQQ(self, response):
 
+		'''	
+		#print response.body	
+		text = response.body
+		index1 = text.find('(')
+		index2 = text.rfind(')')
+		text = text[index1 +1: index2]
+#		print text
+		text = text.replace('"', "'")
+		text = re.sub(r":'(.+?)',", ":\"\\1\",", text)
+ 
+		print text	
+		text1 = re.sub(r"(,?)(\w+?)\s*?:", "\\1\"\\2\":", text)
+		#text1 = text1.replace("'", '"');
+		print text1
+		j = json.loads(text1, 'utf-8')
+#
+		print j	
+
+
+		'''	
 		soup = BeautifulSoup(response.body)
 		items = []
                 #now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -68,7 +89,8 @@ class MusicSpider(BaseSpider):
 			m_item['date'] = now
 			m_item['image'] = cover_div
 			items.append(m_item)
-
+		
+			
 		return items
 
 	def parseXiami(self, response):

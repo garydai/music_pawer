@@ -61,8 +61,9 @@ try:
 					cur.execute(sql)
 					results = cur.fetchone()
 					if results['count(*)'] == 0:
-
+						comment = comment.replace('"', "'")
 						sql = 'insert into other_comment (album_id, comment, tag) values ("%s", "%s", "%s")' %(item['id'], comment, tag)
+						#print sql
 						cur.execute(sql)
 						conn.commit()
 
@@ -115,11 +116,13 @@ try:
 			flag = 0
 			for comment in t['comments']:
 				print comment
+
 				sql = 'select count(*) from other_comment where tag = "%s" ' % (str(comment['commentId']))
 				
 				cur.execute(sql)
 				results = cur.fetchone()
 				if results['count(*)'] == 0:
+					comment['content'] = comment['content'].replace('"', "'")
 
 					sql = 'insert into other_comment (album_id, comment, tag) values ("%s", "%s", "%s")' %(item['id'], comment['content'], str(comment['commentId']))
 					cur.execute(sql)
